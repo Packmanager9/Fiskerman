@@ -1,9 +1,11 @@
 
 window.addEventListener('DOMContentLoaded', (event) =>{
 
+    let inventorizing = -1
     let tip = {}
     let xs
     let ys
+
     // let tap = {}
     // let xz
     // let yz
@@ -33,6 +35,56 @@ window.addEventListener('DOMContentLoaded', (event) =>{
          phy.x = tip.x
          phy.y = tip.y
 
+
+        let wet = 0
+        for(let t = 0;t<man.accessing.contents.length;t++){
+            if(man.accessing.contents[t].graphic.isPointInside(tip)){
+                man.accessing.contents[t].selected *= -1
+                if(inventorizing == 1){
+                    wet = 1
+                }
+                break
+            }
+        }
+        if(inventorizing == 1){
+        for(let t = 0;t<man.accessing.contents.length;t++){
+            if(man.accessing.contents[t].selected == 1){
+                if( man.accessing.contents[t].object.options.option2box.isPointInside(tip)){
+                    man.accessing.contents[t].object.options.option2func()
+                    wet = 1
+                    break
+                }
+                if( man.accessing.contents[t].object.options.option1box.isPointInside(tip)){
+                    man.accessing.contents[t].object.options.option1func()
+                    wet = 1
+                    break
+                }
+                if( man.accessing.contents[t].object.options.option3box.isPointInside(tip)){
+                    man.accessing.contents[t].object.options.option3func()
+                    wet = 1
+                    break
+                }
+
+            }
+        }
+    }
+        if(man.accessing.box.isPointInside(tip)){
+            if(inventorizing == 1){
+                wet = 1
+            }
+        }
+        if(exit.isPointInside(tip)){
+            wet = 1
+            unFish()
+        }
+        if(fisher.isPointInside(tip)){
+            wet = 1
+            goFishing()
+        }
+        if(wet == 0){
+
+            inventorizing *=-1
+        }
         // physicscircles.push(phy)
    
     //   window.addEventListener('mousemove', continued_stimuli);
@@ -53,72 +105,7 @@ window.addEventListener('DOMContentLoaded', (event) =>{
         delete keysPressed[event.key];
      });
 
-     let scrollsum = 0
 
-     function MouseScroll (event) {
-        var rolled = 0;
-        if ('wheelDelta' in event) {
-            rolled = event.wheelDelta;
-        }
-        else {  // Firefox
-                // The measurement units of the detail and wheelDelta properties are different.
-            rolled = -40 * event.detail;
-        }
-        
-        tutorial_canvas_context.scale(1+(rolled/1000),1+(rolled/1000))
-        if(rolled > 0){
-            tutorial_canvas_context.translate(-70,-70)
-        }else{
-            tutorial_canvas_context.translate(70,70)
-        }
-        // tutorial_canvas_context.translate((tutorial_canvas.width*(rolled/30000))/2,(tutorial_canvas.height*(rolled/30000))/2)
-        // scrollsum+=(rolled/30000)
-    }
-
-    // function Init () {
-    //         // for mouse scrolling in Firefox
-    //     var elem = document.getElementById ("infooverlay");
-    //     // var elem = document.getElementById ("tutorial");
-    //     if (elem.addEventListener) {    // all browsers except IE before version 9
-    //             // Internet Explorer, Opera, Google Chrome and Safari
-    //         elem.addEventListener ("mousewheel", MouseScroll, false);
-    //             // Firefox
-    //         elem.addEventListener ("DOMMouseScroll", MouseScroll, false);
-    //     }
-    //     else {
-    //         if (elem.attachEvent) { // IE before version 9
-    //             elem.attachEvent ("onmousewheel", MouseScroll);
-    //         }
-    //     }
-    // }
-
-    // Init()
-
-
-   
-    // function sclaescropp() {
-    //     if (document.body.scrollTop > 1 || document.documentElement.scrollTop > 1) {
-    //       tutorial_canvas_context.scale(.9,.9)
-    //       tutorial_canvas_context.translate(70,70)
-    //       document.body.scrollTop = 0
-    //       document.documentElement.scrollTop = 0
-    //     } else {
-    //     }
-    //     if (document.body.scrollTop < 0 || document.documentElement.scrollTop < 0) {
-   
-    //       tutorial_canvas_context.translate(70,70)
-    //       document.body.scrollTop = 0
-    //       document.documentElement.scrollTop = 0
-    //     } else {
-    //     }
-    // }
-
-
-    //  document.addEventListener('scroll', (event) => {
-
-        
-    //      tutorial_canvas_context.scale(.9,.9)
-    //   });
 
     let tutorial_canvas = document.getElementById("tutorial");
     let tutorial_canvas_context = tutorial_canvas.getContext('2d');
@@ -230,54 +217,12 @@ window.addEventListener('DOMContentLoaded', (event) =>{
             tutorial_canvas_context.stroke(); 
         }
         unmove(){
-             //friction
-            //  if(this.x > tutorial_canvas.width){
-            //     if(this.xmom > 0){
-            //     this.xmom*=-1
-            //     }
-            // }
-            // if(this.y > tutorial_canvas.height){
-            //     if(this.ymom > 0){
-            //     this.ymom*=-1
-            //     }
-            // }
-            // if(this.x < 0){
-            //     if(this.xmom < 0){
-            //     this.xmom*=-1
-            //     }
-            // }
-            // if(this.y < 0){
-            //     if(this.ymom < 0){
-            //         this.ymom*=-1
-            //     }
-            // }
             this.xmom/=.999
             this.ymom/=.999
             this.x -= this.xmom
             this.y -= this.ymom
         }
         move(){
-            //friction
-            // if(this.x > tutorial_canvas.width){
-            //     if(this.xmom > 0){
-            //     this.xmom*=-1
-            //     }
-            // }
-            // if(this.y > tutorial_canvas.height){
-            //     if(this.ymom > 0){
-            //     this.ymom*=-1
-            //     }
-            // }
-            // if(this.x < 0){
-            //     if(this.xmom < 0){
-            //     this.xmom*=-1
-            //     }
-            // }
-            // if(this.y < 0){
-            //     if(this.ymom < 0){
-            //         this.ymom*=-1
-            //     }
-            // }
             this.xmom*=friction
             this.ymom*=friction
             this.x += this.xmom
@@ -336,35 +281,32 @@ window.addEventListener('DOMContentLoaded', (event) =>{
             }
 
         }
+
+
         balance(){
             if(keysPressed['p']){
                 this.length+=.001
+            }else if(keysPressed['o']){
+                if(this.length >= .3){
+                    this.length-=.0001
+                }
             }else{
-                this.length = .79
+                this.length = .79 //.3
             }
-
-            // this.length+=.005
-            // if(this.length <=2){
-            //     this.length = 2
-            // }
             this.beam = new Line(this.body.x, this.body.y, this.anchor.x, this.anchor.y, "yellow", 5)
             let xmomentumaverage 
             let ymomentumaverage
             if(this.anchor != pin2){
-
              xmomentumaverage = (this.body.xmom+this.anchor.xmom)/1.9999
              ymomentumaverage = (this.body.ymom+this.anchor.ymom)/1.9999
             }else{
-                 xmomentumaverage = ((this.body.xmom)+this.anchor.xmom)/1.9999
-                 ymomentumaverage = ((this.body.ymom)+this.anchor.ymom)/1.9999
-
+             xmomentumaverage = ((this.body.xmom)+this.anchor.xmom)/1.9999
+             ymomentumaverage = ((this.body.ymom)+this.anchor.ymom)/1.9999
             }
-
             if(this.body != pin){
                 this.body.xmom = ((this.body.xmom)+xmomentumaverage)/1.9999
                 this.body.ymom = ((this.body.ymom)+ymomentumaverage)/1.9999
             }
-
             if(this.anchor != pin2){
             this.anchor.xmom = ((this.anchor.xmom)+xmomentumaverage)/1.9999
             this.anchor.ymom = ((this.anchor.ymom)+ymomentumaverage)/1.9999
@@ -373,65 +315,35 @@ window.addEventListener('DOMContentLoaded', (event) =>{
             this.anchor.ymom = ((this.anchor.ymom)+ymomentumaverage)/1.9999
             }
                 if(this.beam.hypotenuse() !=0){
-            if(this.beam.hypotenuse() < this.length){
-                if(this.body != pin){
-                this.body.xmom += (this.body.x-this.anchor.x)/(this.length)/14.1
-                this.body.ymom += (this.body.y-this.anchor.y)/(this.length)/14.1
-                }
-
-                // if(pegged == 1){
-                //     if(this.anchor != pin2){
-                //         this.anchor.xmom -= (this.body.x-this.anchor.x)/(this.length)/14.1
-                //         this.anchor.ymom -= (this.body.y-this.anchor.y)/(this.length)/14.1
-                //     }else{
-
-                //         this.anchor.xmom -= (this.body.x-this.anchor.x)/(this.length)/14.1
-                //         this.anchor.ymom -= (this.body.y-this.anchor.y)/(this.length)/14.1
-                //     }
-                // }else{
+                  if(this.beam.hypotenuse() < this.length){
+                    if(this.body != pin){
+                        this.body.xmom += (this.body.x-this.anchor.x)/(this.length)/14.1
+                        this.body.ymom += (this.body.y-this.anchor.y)/(this.length)/14.1
+                    }
                     this.anchor.xmom -= (this.body.x-this.anchor.x)/(this.length)/14.1
                     this.anchor.ymom -= (this.body.y-this.anchor.y)/(this.length)/14.1
-                // }
-            }else if(this.beam.hypotenuse() > this.length){
+              }else if(this.beam.hypotenuse() > this.length){
 
                 if(this.body != pin){
                 this.body.xmom -= (this.body.x-this.anchor.x)/(this.length)/14.1
                 this.body.ymom -= (this.body.y-this.anchor.y)/(this.length)/14.1
-                }
-
-                // if(pegged == 1){
-                //     if(this.anchor != pin2){
-                //         this.anchor.xmom += (this.body.x-this.anchor.x)/(this.length)/14.1
-                //         this.anchor.ymom += (this.body.y-this.anchor.y)/(this.length)/14.1
-                //     }else{
-                //         this.anchor.xmom += (this.body.x-this.anchor.x)/(this.length)/14.1
-                //         this.anchor.ymom += (this.body.y-this.anchor.y)/(this.length)/14.1
-                //     }
-                // }else{
-                    this.anchor.xmom += (this.body.x-this.anchor.x)/(this.length)/14.1
-                    this.anchor.ymom += (this.body.y-this.anchor.y)/(this.length)/14.1
-                // }
             }
+                this.anchor.xmom += (this.body.x-this.anchor.x)/(this.length)/14.1
+                this.anchor.ymom += (this.body.y-this.anchor.y)/(this.length)/14.1
+            }
+          }
+        }
 
-        }
-            // console.log(this)
-        }
+
         draw(){
             this.beam = new Line(this.body.x, this.body.y, this.anchor.x, this.anchor.y, "black", .5)
             this.beam.draw()
-            // this.body.draw()
-            // this.anchor.draw()
         }
         move(){
             if(this.body !== pin){
                 this.body.move()
             }
-            // if(Math.random()<.01){
-            //     this.anchor.xmom-=1
-            // }
             if(pegged == 1){
-                // if(this.anchor != pin2){
-                    // this.anchor.ymom+=gravity
                     if(flammed == 0){
 
                         this.anchor.move()
@@ -445,32 +357,215 @@ window.addEventListener('DOMContentLoaded', (event) =>{
                     this.anchor.move()
                 }
                     }
-                // }
             }else{
-                // this.anchor.ymom+=gravity
                 this.anchor.move()
             }
         }
 
 
     }
+      
+    class Item{
+        constructor(object, isin){
+            this.selected = -1
+            this.object = object
+            this.options = object.options
+            this.isin = isin
+            if(this.object == 0){
+                this.graphic = new Rectangle(0,0,20,20,"gray")
+            }else{
+                    this.graphic = this.object.graphic
+            }
+        }
+        draw(){
+            this.graphic.draw()
+            if(this.selected == 1){
+                if(this.object!==0){
 
+                    // console.log(this)
+                    this.object.options.draw()
+                }
+            }
+        }
+    }
+    class Inventory{
+        constructor(object, size){
+            this.box = new Rectangle(10,40, 350, 260, "#555555")
+            this.object = object
+            
+            this.contents = []
+            for(let t = 0;t<size;t++){
+                this.contents.push(new Item(0, this))
+            }
+        }
+        draw(){
+            this.box.draw()
+            let y = -25
+            for(let t=0;t<this.contents.length;t++){
+                if(t%9 ==0){
+                    y+=25
+                }
+                this.contents[t].graphic.x = this.box.x+19+((t%9)*25)
+                this.contents[t].graphic.y = this.box.y+15+y
+            }
+            for(let t=0;t<this.contents.length;t++){
+                if(this.contents[t].selected == 1){
+                    this.contents[t].graphic.color = "yellow"
+                }else{
+                    this.contents[t].graphic.color =  "#DDDDDD"
+                }
+                this.contents[t].draw()
+            }
+        }
+        add(object){
+            for(let t = 0;t<this.contents.length;t++){
+                if(this.contents[t].object == 0){
+                    this.contents[t].object = object
+                    this.contents[t].graphic = object.graphic
+                    this.contents[t].isin = this
+                    break
+                }
+            }
+        }
+    }
+
+    class Graph{
+        constructor(human){
+            this.human = human
+        }
+    }  
     class Human{
         constructor(){
             this.caloricdemand = 2400
             this.calories = 350000
+            this.yearlycalories = this.caloricdemand*365.25
+            this.graph = new Graph(this)
+            this.inventory = new Inventory(this, 117)
+            this.accessing = this.inventory
         }
         live(){
             this.calories-=.0001
         }
     }
+    let man = new Human()
+    
+    class Circgraphic{
+        constructor(ball){
+            this.color =  "#DDDDDD"
+            this.x = 0
+            this.y = 0
+            this.body = new Rectangle(0,0,20,20, "#DDDDDD")
+            this.ball = ball
+        }
+        draw(){
+            this.body.color = this.color
+            this.body.x = this.x
+            this.body.y = this.y
+            this.ball.x = this.body.x+(this.body.width*.5)
+            this.ball.y = this.body.y+(this.body.height*.5)
+            this.body.draw()
+            this.ball.draw()
+        }
+        isPointInside(point){
+            if(this.body.isPointInside(point)){
+                return true
+            }
+            return false
+        }
+    }
+    class Options{
+        constructor(type, object){
+      
+            this.object = object
+            if(type >= 0){
+                
+                this.type = type
+                }else{
+                    this.type = 0
+                    this.object.calories = 0
+                }
+            this.option1 = "delete"
+            this.option1box = new Rectangle(man.inventory.box.width+man.inventory.box.x- 75,man.inventory.box.height+man.inventory.box.y, 50, 75, "red" )
+         
+            
+            this.option2 = " "
+            this.option3 = " "
+            this.option2box = new Rectangle(man.inventory.box.width+man.inventory.box.x- 150,man.inventory.box.height+man.inventory.box.y, 50, 75, "yellow" )
 
+
+            this.option3box = new Rectangle(man.inventory.box.width+man.inventory.box.x- 225,man.inventory.box.height+man.inventory.box.y, 50, 75, "gray" )
+
+
+
+            switch (this.type){
+                case 0:
+                    //food
+
+                    this.option2 = "eat"
+                    this.option3 = "cancel"          
+                    
+                    
+                break
+                case 1:
+                    //wood?
+                    this.option2 = "wood"
+
+                break
+            }
+        }
+        option1func(){
+            if(this.type == 0){
+                for(let t = 0;t<man.inventory.contents.length;t++){
+                    if(man.inventory.contents[t].selected == 1){
+                        man.inventory.contents[t] =new Item(0, this)
+                    }
+                }
+            }
+        }
+        option2func(){
+            if(this.type == 0){
+                for(let t = 0;t<man.inventory.contents.length;t++){
+                    if(man.inventory.contents[t].selected == 1){
+                        // console.log(man.inventory.contents[t])
+                        man.calories+=man.inventory.contents[t].object.object.calories
+                        man.inventory.contents[t] =new Item(0, this)
+                    }
+                }
+            }
+        }
+        option3func(){
+            if(this.type == 0){
+                for(let t = 0;t<man.inventory.contents.length;t++){
+                    if(man.inventory.contents[t].selected == 1){
+                        man.inventory.contents[t].selected = -1
+                    }
+                }
+            }
+        }
+        draw(){
+            
+            this.option1box.draw()
+            tutorial_canvas_context.fillStyle = "black";
+            tutorial_canvas_context.font = `${18}px Arial`;
+            tutorial_canvas_context.fillText(`${this.option1}`, 10+this.option1box.x,25+this.option1box.y);
+            this.option2box.draw()
+            tutorial_canvas_context.fillStyle = "black";
+            tutorial_canvas_context.font = `${18}px Arial`;
+            tutorial_canvas_context.fillText(`${this.option2}`, 10+this.option2box.x,25+this.option2box.y);
+            this.option3box.draw()
+            tutorial_canvas_context.fillStyle = "black";
+            tutorial_canvas_context.font = `${18}px Arial`;
+            tutorial_canvas_context.fillText(`${this.option3}`, 10+this.option3box.x,25+this.option3box.y);
+        }
+    }
     class Fish{
         constructor(x,y){
-            this.body = new Circle(x,y,3+Math.random()*5, "gray")
+            this.body = new Circle(x,y,3+Math.random()*5, "#666611")
             this.anchored = 0
             this.tired = 0
             this.calories = this.body.radius*141
+            this.graphic = new Circgraphic(this.body)
+            this.options = new Options(0, this)
         }
         draw(){
             if(pin2.isPointInside(this.body)){
@@ -501,48 +596,26 @@ window.addEventListener('DOMContentLoaded', (event) =>{
 
     let springs = []
 
-    let islant =  new Circle(350,350, 120, "green")
-    let islant2 =  new Circle(350,350, 130, "tan")
+    let islant 
+    let islant2 
 
     let pin = new Circle(350,350, 10, "blue")
-    let pin2 = new Circle(350,350, 15, "blue")
+    let pin2
 
-    let spring = new Spring(pin)
-    springs.push(spring)
-    for(let k = 0; k<279;k++){
-        spring = new Spring(spring.anchor)
-        if(k < 278){
-            springs.push(spring)
-        }else if(k == 278 ){
-            spring.anchor = pin2
-            springs.push(spring)
-        }
-    }
-
+    let spring
     let fish = []
 
-    for(let t = 0;t<25;t++){
-        let fishie = new Fish(Math.random()*700,Math.random()*700)
     
-        if(!islant2.isPointInside(fishie.body)){
-            fish.push(fishie)
-        }
-
-    }
-    
-    let hstop = 0
-    let dis = 100
-    let locale = new Circle(350,350, 0, "red")
+    let hstop 
+    let dis
+    let locale
 
     let list = []
     list.push(springs)
+    goFishing()
 
-    // pin.x = (dis*(Math.sin(angle)))+locale.x
-    // pin.y = (dis*(Math.cos(angle)))+locale.y
-    // pin.xmom = 0
-    // pin.ymom = 0
-
-    let man = new Human()
+    let exit = new Rectangle(0,0,20,20,"red")
+    let fisher = new Rectangle(20,0,20,20,"blue")
 
     window.setInterval(function(){ 
         flammed = 0
@@ -553,50 +626,8 @@ window.addEventListener('DOMContentLoaded', (event) =>{
         infooverlay_context.clearRect(-10000,-10000,tutorial_canvas.width*100, tutorial_canvas.height*100)
         islant2.draw()
         islant.draw()
-        // for(let f = 0; f< physicscircles.length; f++){
-        //     physicscircles[f].ymom += gravity
-        //     physicscircles[f].move()
-        //     physicscircles[f].draw()
-        //     for(let w = 0; w< objsprings.length; w++){
-        //         if(physicscircles[f].isPointInside(objsprings[w])){
-        //             objsprings[w].ymom+=(physicscircles[f].ymom/2)
-        //             physicscircles[f].ymom-=(physicscircles[f].ymom/2)
-        //             objsprings[w].xmom+=(physicscircles[f].xmom/2)
-        //             physicscircles[f].xmom-=(physicscircles[f].xmom/2)
-        //             if(w>(objsprings.length/2)){
-        //                 if(objsprings[w].xmom > 0){
-        //                     physicscircles[f].xmom+=objsprings[w].xmom/2
-        //                     objsprings[w].xmom-=objsprings[w].xmom/2
-        //                 }
-        //             }else{
-        //                 if(objsprings[w].xmom < 0){
-        //                     physicscircles[f].xmom+=objsprings[w].xmom/2
-        //                     objsprings[w].xmom-=objsprings[w].xmom/2
-        //                 }
-        //             }
-        //         }
-        //     }
-    
-        // }
 
         hstop++
-        // for(let t = 0; t<badsprings.length;t++){
-        //     badsprings[t].balance()
-        //     badsprings[t].draw()
-        // }
-        // let lx = pin.x
-        // let ly = pin.y`
-
-        // pin.x = (dis*(Math.sin(angle)))+locale.x
-        // pin.y = (dis*(Math.cos(angle)))+locale.y
-
-        // pin.xmom -=(pin.x-lx)*1
-        // pin.ymom += (pin.y-ly)*1
-        // // springs[1].anchor.xmom -=(pin.x-lx)*1
-        // // springs[1].anchor.ymom += (pin.y-ly)*1
-
-        // pin.xmom *= .90
-        // pin.ymom *= .90
 
         pin.draw()
         for(let u = 0;u<3;u++){
@@ -613,36 +644,6 @@ window.addEventListener('DOMContentLoaded', (event) =>{
 
             springs[s].draw()
         }
-        // if(keysPressed['c']){
-        //     gravity+=.001
-        //     if(gravity > 1.5){
-        //      gravity = 1.5
-        //     }
-        //     gravity =   parseFloat(gravity.toPrecision(4))
-        // }
-        // if(keysPressed['v']){
-        //    gravity-=.001
-        //    if(gravity < -1.5){
-        //     gravity = -1.5
-        //    }
-        //    gravity =   parseFloat(gravity.toPrecision(4))
-        // }
-        // if(keysPressed['f']){
-        //     friction-=.0001
-        //     if(friction < .10){
-        //         friction = .10
-        //     }
-        //     friction =   parseFloat(friction.toPrecision(6))
-        // }
-        // if(keysPressed['g']){
-
-        //     friction+=.0001
-        //     if(friction > 1.001){
-        //         friction =1.001
-        //     }
-        //    friction =   parseFloat(friction.toPrecision(6))
-        // }
-
 
         // if(keysPressed[' ']){
             if(keysPressed['w']){
@@ -675,23 +676,6 @@ window.addEventListener('DOMContentLoaded', (event) =>{
                     pin.x -= .51  
                 }
             }
-        // }
-      
-        // if(keysPressed['e']){
-        //     for(let s = 0; s<springs.length; s++){
-        //         springs[s].length +=.001
-        //     }
-        // }
-        // if(keysPressed['q']){
-        //     for(let s = 0; s<springs.length; s++){
-        //         springs[s].length -=.001
-        //         if(springs[s].length < .1){
-        //             springs[s].length =.1
-        //         }
-        //     }
-        // }
-        // pin.xmom = 0
-        // pin.ymom = 0
         pin.xmom *= .90
         pin.ymom *= .90
         if(pegged == 1){
@@ -731,12 +715,16 @@ window.addEventListener('DOMContentLoaded', (event) =>{
         }    for(let t = 0;t<fish.length;t++){
         if(islant2.isPointInside(fish[t].body)){
             if(fish[t].anchored == 1){
-                man.calories += fish[t].calories
+                // man.calories += fish[t].calories
+                man.inventory.add(new Item(fish[t], man.inventory))
+                // unFish()
+                // goFishing()
                 for(let g = 0; g<objsprings.length;g++){
                     objsprings[g].xmom = 0
                     objsprings[g].ymom = 0
                 }
             }
+            // console.log(man)
             fish.splice(t,1)
             let fishie = new Fish(Math.random()*700,Math.random()*700)
     
@@ -746,10 +734,65 @@ window.addEventListener('DOMContentLoaded', (event) =>{
     
         }
         }
+        if(inventorizing == 1){
+        man.inventory.draw()
+        }
         
+        exit.draw()
+        fisher.draw()
     }, 1) 
 
 
+    function goFishing(){
+        
+     springs = []
+
+     islant =  new Circle(350,350, 120, "green")
+     islant2 =  new Circle(350,350, 130, "tan")
+
+     pin = new Circle(350,350, 10, "blue")
+     pin2 = new Circle(350,350, 15, "blue")
+
+     spring = new Spring(pin)
+    springs.push(spring)
+    for( let k = 0; k<279;k++){
+        spring = new Spring(spring.anchor)
+        if(k < 278){
+            springs.push(spring)
+        }else if(k == 278 ){
+            spring.anchor = pin2
+            springs.push(spring)
+        }
+    }
+
+     fish = []
+
+    for( t = 0;t<25;t++){
+         fishie = new Fish(Math.random()*700,Math.random()*700)
+    
+        if(!islant2.isPointInside(fishie.body)){
+            fish.push(fishie)
+        }
+
+    }
+    
+     hstop = 0
+     dis = 100
+     locale = new Circle(350,350, 0, "red")
+
+     list = []
+    list.push(springs)
+
+
+    }
+
+    function unFish(){
+        fish = []
+
+        islant =  new Circle(350,350, 1200, "green")
+        islant2 =  new Circle(350,350, 1300, "tan")
+        springs = []
+    }
 
         
 })
