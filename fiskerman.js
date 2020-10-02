@@ -1,10 +1,14 @@
 
 window.addEventListener('DOMContentLoaded', (event) =>{
 
+
+    let time = 300000
+    let day = 0
     let inventorizing = -1
     let tip = {}
     let xs
     let ys
+    let hunting = 0
 
     // let tap = {}
     // let xz
@@ -76,10 +80,15 @@ window.addEventListener('DOMContentLoaded', (event) =>{
         if(exit.isPointInside(tip)){
             wet = 1
             unFish()
+            unHunt()
         }
         if(fisher.isPointInside(tip)){
             wet = 1
             goFishing()
+        }
+        if(hunter.isPointInside(tip)){
+            wet = 1
+            goHunting()
         }
         if(wet == 0){
 
@@ -193,6 +202,106 @@ window.addEventListener('DOMContentLoaded', (event) =>{
             }
             return false
         }
+    }
+
+    class Animal{
+        constructor(x,y){
+            this.body = new Circle(x,y,3+Math.random()*5, "brown")
+            if(Math.random()<.8){
+                this.body = new Circle(x,y,3+Math.random()*4, "tan")
+            }
+            this.anchored = 0
+            this.tired = 0
+            this.calories = this.body.radius*141
+            this.graphic = new Circgraphic(this.body)
+            this.options = new Options(0, this)
+            this.xmom = Math.random()-.5
+            this.ymom = Math.random()-.5
+        }
+        draw(){
+            if(pin.isPointInside(this.body)){
+                if(this.tired == 1){
+                    man.inventory.add(new Item(this, man.inventory))
+                    this.graphic = new Circgraphic(this.body)
+                    if(animals.includes(this)){
+
+                        animals.splice(animals.indexOf(this),1)
+                    }
+                }
+            }
+            if(man.cord.isPointInside(this.body)){
+                this.body = new BulletCircle(this.body.x, this.body.y, this.body.radius, this.body.color)
+                this.tired = 1
+            }
+            if(this.tired == 0){
+                this.body.x+=this.xmom
+                this.body.y+=this.ymom
+            }
+            if(this.body.x > 3500){
+                if(this.xmom > 0){
+                    this.xmom*=-1
+                }
+            }
+            if(this.body.x  < 0){
+                if(this.xmom < 0){
+                    this.xmom*=-1
+                }
+            }
+            if(this.body.y > 3500){
+                if(this.ymom > 0){
+                    this.ymom*=-1
+                }
+            }
+            if(this.body.y  < 0){
+                if(this.ymom < 0){
+                    this.ymom*=-1
+                }
+            }
+            this.body.draw()
+        }
+    }
+    class BulletCircle{        
+        
+        constructor(x, y, radius, color, xmom = 0, ymom = 0){
+        this.height = 0
+        this.width = 0
+        this.x = x
+        this.y = y
+        this.radius = radius
+        this.color = color
+        this.xmom = xmom
+        this.ymom = ymom
+        this.lens = 0
+    }        
+     draw(){
+        tutorial_canvas_context.lineWidth = this.radius - .5
+        tutorial_canvas_context.strokeStyle = this.color
+        tutorial_canvas_context.beginPath();
+        tutorial_canvas_context.arc(this.x, this.y, this.radius-1, 0, (Math.PI*2), true)
+        tutorial_canvas_context.fillStyle = "red"
+       tutorial_canvas_context.fill()
+        tutorial_canvas_context.stroke(); 
+    }
+    unmove(){
+        this.xmom/=.999
+        this.ymom/=.999
+        this.x -= this.xmom
+        this.y -= this.ymom
+    }
+    move(){
+        this.xmom*=friction
+        this.ymom*=friction
+        this.x += this.xmom
+        this.y += this.ymom
+    }
+    isPointInside(point){
+        this.areaY = point.y - this.y 
+        this.areaX = point.x - this.x
+        if(((this.areaX*this.areaX)+(this.areaY*this.areaY)) <= (this.radius*this.radius)){
+            return true
+        }
+        return false
+    }
     }
     class Circle{
         constructor(x, y, radius, color, xmom = 0, ymom = 0){
@@ -442,9 +551,41 @@ window.addEventListener('DOMContentLoaded', (event) =>{
             this.graph = new Graph(this)
             this.inventory = new Inventory(this, 117)
             this.accessing = this.inventory
+            this.angle = 0
+            this.dis = 10
+            this.mag = 10
+            
+            this.triggered = 0
         }
         live(){
-            this.calories-=.0001
+            this.cord = new Circle(pin.x+(Math.sin(this.angle)*this.dis),pin.y+(Math.cos(this.angle)*this.dis), 7, "black")
+            this.calories-=this.caloricdemand/300000
+            if(hunting == 1){
+
+                if(keysPressed['l']){
+                    this.angle+=.05
+                }
+                if(keysPressed['j']){
+                    this.angle-=.05
+                }
+                
+                this.cord = new Circle(pin.x+(Math.sin(this.angle)*this.dis),pin.y+(Math.cos(this.angle)*this.dis), 7, "black")
+                this.cord.draw()
+
+                if(this.triggered == 1){
+                    this.dis += this.mag
+                }
+                if(this.dis >=10){
+                    this.dis*=.98
+                    this.mag*=.9
+                }else{
+                    this.triggered = 0
+                }
+                if(keysPressed[' ']){
+                    this.triggered = 1
+                    this.mag = 10
+                }
+            }
         }
     }
     let man = new Human()
@@ -604,8 +745,11 @@ window.addEventListener('DOMContentLoaded', (event) =>{
 
     let spring
     let fish = []
+    let animals = []
 
-    
+    // let bear = new Animal(200,200)
+    // animals.push(bear)
+
     let hstop 
     let dis
     let locale
@@ -616,8 +760,15 @@ window.addEventListener('DOMContentLoaded', (event) =>{
 
     let exit = new Rectangle(0,0,20,20,"red")
     let fisher = new Rectangle(20,0,20,20,"blue")
+    let hunter = new Rectangle(40,0,20,20,"brown")
 
     window.setInterval(function(){ 
+        
+        time--
+        if(time == 0){
+            day+=1
+             time = 300000
+        }
         flammed = 0
         if(keysPressed[' ']){
             flammed = 1
@@ -648,6 +799,13 @@ window.addEventListener('DOMContentLoaded', (event) =>{
         // if(keysPressed[' ']){
             if(keysPressed['w']){
                 pin.y -= .5
+                // if(hunting == 1){
+                //     tutorial_canvas_context.translate(0,.5)
+                //     hunter.y-=.5
+                //     exit.y-=.5
+                //     fisher.y-=.5
+                //     man.inventory.box.y-=.5
+                // }
                 if(!islant2.isPointInside(pin)){
                    pin.y += .51  
                }
@@ -655,6 +813,13 @@ window.addEventListener('DOMContentLoaded', (event) =>{
             }
             if(keysPressed['a']){
                 pin.x -= .5
+                // if(hunting == 1){
+                //     tutorial_canvas_context.translate(.5,0)
+                //     hunter.x-=.5
+                //     fisher.x-=.5
+                //     exit.x-=.5
+                //     man.inventory.box.x-=.5
+                // }
                 
                 if(!islant2.isPointInside(pin)){
                     pin.x += .51  
@@ -664,6 +829,13 @@ window.addEventListener('DOMContentLoaded', (event) =>{
     
             if(keysPressed['s']){
                 pin.y += .5
+                // if(hunting == 1){
+                // tutorial_canvas_context.translate(0,-.5)
+                // hunter.y+=.5
+                // fisher.y+=.5
+                // exit.y+=.5
+                // man.inventory.box.y+=.5
+                // }
                 if(!islant2.isPointInside(pin)){
                    pin.y -= .51  
                }
@@ -672,6 +844,13 @@ window.addEventListener('DOMContentLoaded', (event) =>{
             if(keysPressed['d']){
                 
                 pin.x += .5  
+                // if(hunting == 1){
+                //     tutorial_canvas_context.translate(-.5,0)
+                //     hunter.x+=.5
+                //     fisher.x+=.5
+                //     exit.x+=.5
+                //     man.inventory.box.x+=.5
+                // }
                  if(!islant2.isPointInside(pin)){
                     pin.x -= .51  
                 }
@@ -684,11 +863,15 @@ window.addEventListener('DOMContentLoaded', (event) =>{
         }
         // pin2.unmove() 
 
-        // man.live()
+        man.live()
 
         infooverlay_context.fillStyle = "white";
         infooverlay_context.font = `${18}px Arial`;
         infooverlay_context.fillText(`Calories: ${Math.round(man.calories-350000)}`, 10,20);
+        if(inventorizing ==1){
+
+            infooverlay_context.fillText(`Day: ${day}`, 610,20);
+        }
 
         // infooverlay_context.fillText(`Gravity; ${gravity} pixels/second`, 10,40);
 
@@ -712,7 +895,13 @@ window.addEventListener('DOMContentLoaded', (event) =>{
            
             }
             
-        }    for(let t = 0;t<fish.length;t++){
+        }    
+        for(let t = 0;t<animals.length;t++){
+            animals[t].draw()
+            }
+            
+        
+        for(let t = 0;t<fish.length;t++){
         if(islant2.isPointInside(fish[t].body)){
             if(fish[t].anchored == 1){
                 // man.calories += fish[t].calories
@@ -740,11 +929,13 @@ window.addEventListener('DOMContentLoaded', (event) =>{
         
         exit.draw()
         fisher.draw()
+        hunter.draw()
     }, 1) 
 
 
     function goFishing(){
         
+        hunting = 0
      springs = []
 
      islant =  new Circle(350,350, 120, "green")
@@ -788,7 +979,49 @@ window.addEventListener('DOMContentLoaded', (event) =>{
 
     function unFish(){
         fish = []
+        animals = []
+        unHunt()
 
+
+        exit = new Rectangle(0,0,20,20,"red")
+        fisher = new Rectangle(20,0,20,20,"blue")
+        hunter = new Rectangle(40,0,20,20,"brown")
+        islant =  new Circle(350,350, 1200, "green")
+        islant2 =  new Circle(350,350, 1300, "tan")
+        springs = []
+    }
+    function goHunting(){
+        unFish()
+        unHunt()
+        
+     pin = new Circle(350,350, 10, "blue")
+        hunting = 1
+        fish = []
+
+        islant =  new Circle(350,350, 1200000, "green")
+        islant2 =  new Circle(350,350, 1300000, "tan")
+        springs = []
+
+        
+    for( t = 0;t<102;t++){
+        fishie = new Animal(-3500+Math.random()*7000,-3500+Math.random()*7000)
+   
+       if(islant2.isPointInside(fishie.body)){
+           animals.push(fishie)
+       }
+
+   }
+    }
+
+
+    function unHunt(){
+        hunting = 0
+        fish = []
+        animals = []
+
+         exit = new Rectangle(0,0,20,20,"red")
+         fisher = new Rectangle(20,0,20,20,"blue")
+         hunter = new Rectangle(40,0,20,20,"brown")
         islant =  new Circle(350,350, 1200, "green")
         islant2 =  new Circle(350,350, 1300, "tan")
         springs = []
