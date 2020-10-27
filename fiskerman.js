@@ -121,7 +121,7 @@ window.addEventListener('DOMContentLoaded', (event) =>{
     let infooverlay = document.getElementById("infooverlay");
     let infooverlay_context = infooverlay.getContext('2d');
     infooverlay.style.background = "transparent"
-    infooverlay.style.marginTop = "-720px"
+    infooverlay.style.marginTop = "20px"
     tutorial_canvas.style.background = "#11AAFF"
 
     class Triangle{
@@ -562,10 +562,10 @@ window.addEventListener('DOMContentLoaded', (event) =>{
             this.calories-=this.caloricdemand/300000
             if(hunting == 1){
 
-                if(keysPressed['l']){
+                if(keysPressed['q']){
                     this.angle+=.05
                 }
-                if(keysPressed['j']){
+                if(keysPressed['e']){
                     this.angle-=.05
                 }
                 
@@ -578,6 +578,9 @@ window.addEventListener('DOMContentLoaded', (event) =>{
                 if(this.dis >=10){
                     this.dis*=.98
                     this.mag*=.9
+                    if(this.dis > 250){
+                        this.dis = 250
+                    }
                 }else{
                     this.triggered = 0
                 }
@@ -934,7 +937,7 @@ window.addEventListener('DOMContentLoaded', (event) =>{
 
 
     function goFishing(){
-        
+        animals = []
         hunting = 0
      springs = []
 
